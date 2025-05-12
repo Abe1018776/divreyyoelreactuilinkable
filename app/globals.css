@@ -5,25 +5,15 @@
 
 @font-face {
   font-family: 'Mekorot-Rashi';
-  src: url('/fonts/Mekorot-Rashi.ttf') format('truetype'); /* Assuming font is in public/fonts/ */
+  src: url('/fonts/Mekorot-Rashi.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
-/* Base body styles */
-body {
-  font-family: Arial, Helvetica, sans-serif; /* This will be overridden by Tailwind or Next/Font if set on <html> or <body> via className */
-  direction: rtl;
-}
-
-/* Custom font class for Rashi/Mekorot text */
-.my-font { /* Or .rashi-font */
-  font-family: 'Mekorot-Rashi', sans-serif;
-}
-
 /* Shadcn/UI Base Styles & Customizations */
 @layer base {
+  /* CSS Variables for theme colors */
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
@@ -31,7 +21,7 @@ body {
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%; /* Default primary from Shadcn */
+    --primary: 0 0% 9%;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -43,17 +33,10 @@ body {
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%; /* Default ring from Shadcn */
-    --radius: 0.5rem; /* Default radius from Shadcn */
+    --ring: 0 0% 3.9%;
+    --radius: 0.5rem;
 
-    /* Chart colors (keep if used) */
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-
-    /* Sidebar specific colors from your old config */
+    /* Sidebar colors */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -64,6 +47,7 @@ body {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
+  /* Dark mode overrides */
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -79,20 +63,12 @@ body {
     --muted-foreground: 0 0% 63.9%;
     --accent: 0 0% 14.9%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%; /* Adjusted from original destructive in light */
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%; /* Adjusted from original ring in light */
+    --ring: 0 0% 83.1%;
 
-    /* Chart colors dark (keep if used) */
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-
-    /* Sidebar specific colors dark */
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -100,91 +76,45 @@ body {
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    /* --sidebar-ring: 217.2 91.2% 59.8%; */ /* ring might be same as light or adjusted */
   }
-}
 
-/* Apply base border, background, and text colors */
-@layer base {
+  /* Global layout & typography */
+  html {
+    direction: rtl;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased min-h-screen;
+    font-family: var(--font-noto-sans-hebrew);
+  }
+
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
-    /* Ensure Tailwind's font smoothing is applied if desired */
-    font-feature-settings: "rlig" 1, "calt" 1; 
-  }
 }
 
-/* Custom Utilities from your old globals.css */
+/* Custom Utilities */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
 
-  /* Custom select styles - keep if needed for non-Shadcn selects */
-  .custom-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23888' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: left 0.75rem center;
-    background-size: 1em;
-    padding-left: 2.5rem; /* For RTL, this should be padding-right if icon is on right */
-    transition: all 0.2s ease;
+  .my-font {
+    font-family: 'Mekorot-Rashi', sans-serif;
   }
 
-  .custom-select:focus {
-    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.25); /* Using ring color with opacity */
-    outline: none;
+  /* Header underline styling if used */
+  header.app-header {
+    @apply bg-salmon-100;
   }
-
-  .select-container {
-    position: relative;
-    margin-bottom: 0.75rem;
+  header.app-header h1::after {
+    content: "";
+    @apply block absolute bottom-[-8px] bg-primary opacity-50 transition-all;
+    width: 50%;
+    right: 25%;
+    height: 2px;
   }
-
-  .select-label { /* For floating labels on custom selects */
-    position: absolute;
-    right: 0.75rem; /* Good for RTL */
-    top: -0.7rem;
-    padding: 0 0.5rem;
-    background-color: hsl(var(--background)); /* Use CSS var */
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: hsl(var(--primary));
-    transition: all 0.2s ease;
-    z-index: 1;
+  header.app-header:hover h1::after {
+    @apply w-4/5 right-[10%];
   }
-}
-
-/* Specific Header styles from your old globals.css */
-/* These are not Tailwind classes, so they apply directly */
-/* You might want to convert these to Tailwind classes if possible */
-header.app-header { /* Add a class to your header element in page.tsx */
-  background-color: #FA8072; /* Salmon pink */
-}
-
-header.app-header h1 {
-  position: relative;
-  display: inline-block;
-}
-
-header.app-header h1::after {
-  content: "";
-  position: absolute;
-  bottom: -8px;
-  /* Adjust for RTL if title is centered or right-aligned */
-  right: 25%; 
-  left: auto; /* Ensure left is auto for RTL */
-  width: 50%;
-  height: 2px;
-  background-color: hsl(var(--primary));
-  opacity: 0.5;
-  transition: width 0.3s ease, right 0.3s ease, left 0.3s ease;
-}
-
-header.app-header:hover h1::after {
-  width: 80%;
-  right: 10%; /* Adjust for RTL */
-  left: auto; 
 }

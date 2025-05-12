@@ -1,17 +1,17 @@
 // app/layout.tsx
-import './globals.css'; // Your merged global styles
+import './globals.css'; // Tailwind directives & your custom CSS
 import { Noto_Sans_Hebrew } from 'next/font/google';
 import localFont from 'next/font/local';
-import { ThemeProvider } from "@/components/theme-provider"; // Assuming you create this for dark mode
+import { ThemeProvider } from "@/components/theme-provider";
 
 const notoSansHebrew = Noto_Sans_Hebrew({
   subsets: ['hebrew', 'latin'],
-  variable: '--font-noto-sans-hebrew', // CSS variable for Tailwind
+  variable: '--font-noto-sans-hebrew',
   display: 'swap',
 });
 
 const mekorotRashi = localFont({
-  src: '../public/fonts/Mekorot-Rashi.ttf', // Path relative to app directory
+  src: '../public/fonts/Mekorot-Rashi.ttf',
   variable: '--font-mekorot-rashi',
   display: 'swap',
 });
@@ -27,19 +27,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="he" dir="rtl" className={`${notoSansHebrew.variable} ${mekorotRashi.variable}`} suppressHydrationWarning>
-      {/* No need for <head> here for preloading if using next/font correctly; next/font handles it.
-          The <link rel="preload"> for Mekorot-Rashi.ttf is handled by next/font/local when display: 'swap' is used.
-      */}
-      <body>
+    <html
+      lang="he"
+      dir="rtl"
+      className={`${notoSansHebrew.variable} ${mekorotRashi.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="bg-background text-foreground font-sans antialiased min-h-screen">
         <ThemeProvider
-            attribute="class"
-            defaultTheme="system" // Or "light" or "dark"
-            enableSystem
-            disableTransitionOnChange
-          >
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           {children}
-          {/* Consider adding a Toaster component here if you use Shadcn toasts */}
         </ThemeProvider>
       </body>
     </html>
