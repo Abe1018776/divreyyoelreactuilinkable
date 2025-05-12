@@ -177,8 +177,8 @@ export default function SearchPage() {
                                        result.matchType === 'summary' ? 'תקציר' : 'תוכן'}
                                     </span>
                                   </div>
-                                  <p className="text-sm font-semibold text-right w-full">{result.dvar.title || "ללא כותרת"}</p>
-                                  <p className="text-xs text-muted-foreground text-right w-full">{result.dvar.summary || "ללא תקציר"}</p>
+                                  <p className="text-sm font-semibold text-right w-full truncate">{result.dvar.title || "ללא כותרת"}</p>
+                                  <p className="text-xs text-muted-foreground text-right w-full truncate">{result.dvar.summary || "ללא תקציר"}</p>
                                 </div>
                               </Button>
                             ))}
