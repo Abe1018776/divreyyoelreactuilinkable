@@ -30,12 +30,7 @@ interface DvarTorahItem {
   summary: string;
   contents: PassageContent[];
 }
-interface SearchResultItem {
-  dvar: DvarTorahItem;
-  parsha: string;
-  seder: string;
-  type: string;
-}
+// Search functionality moved to /search page
 
 export default function Page() {
   const isMobile = useIsMobile();
@@ -61,15 +56,13 @@ export default function Page() {
 
   const [language, setLanguage] = useState<"en" | "he">("he"); // Keep if needed
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  // Search functionality removed - only using global search at /search
 
   // --- Data Fetching useEffects (same robust versions as before) ---
   useEffect(() => { /* Effect 2: Fetch Sedarim or Moadim list */
     // ... (Your complete Effect 2 code with detailed logging)
     const effectName = "Effect 2 (Type Change)"; console.log(`\n[${effectName}] Triggered. selectedType:`, selectedType);
-    setSelectedSeder(""); setAvailableSedarim([]); setSelectedSecondLevelItem(""); setAvailableSecondLevelItems([]); setBook([]); setSelectedDvar(undefined); setIsSearching(false); setSearchQuery("");
+    setSelectedSeder(""); setAvailableSedarim([]); setSelectedSecondLevelItem(""); setAvailableSecondLevelItems([]); setBook([]); setSelectedDvar(undefined);
     if (selectedType === "Torah") {
       setIsSederListLoading(true); fetch('/api/sedarim')
         .then(async r => { if (!r.ok) { const txt = await r.text().catch(()=>''); throw new Error(`Sedarim API ${r.status}: ${txt}`);} return r.json();})
@@ -89,7 +82,7 @@ export default function Page() {
     // ... (Your complete Effect 3 code with detailed logging)
     const effectName = "Effect 3 (Seder Change)"; console.log(`\n[${effectName}] Triggered. Type: ${selectedType}, Seder: ${selectedSeder}`);
     if (selectedType !== "Torah" || !selectedSeder) { if (selectedType !== "Torah") {setAvailableSecondLevelItems([]); setSelectedSecondLevelItem("");} return; }
-    setSelectedSecondLevelItem(""); setAvailableSecondLevelItems([]); setBook([]); setSelectedDvar(undefined); setIsSearching(false); setSearchQuery(""); setIsSecondLevelListLoading(true);
+    setSelectedSecondLevelItem(""); setAvailableSecondLevelItems([]); setBook([]); setSelectedDvar(undefined); setIsSecondLevelListLoading(true);
     fetch(`/api/parshiot?type=Torah&seder=${encodeURIComponent(selectedSeder)}`)
       .then(async r => { if (!r.ok) { const txt = await r.text().catch(()=>''); throw new Error(`Parshiot API ${r.status}: ${txt}`);} return r.json();})
       .then(d => { const l = d.parshiot || []; setAvailableSecondLevelItems(l); if (l.length > 0) setSelectedSecondLevelItem(l[0]); else setSelectedSecondLevelItem("");})
@@ -107,7 +100,7 @@ export default function Page() {
 
     const url = selectedType === "Torah" ? `/api/content?type=Torah&seder=${encodeURIComponent(selectedSeder)}&parsha=${encodeURIComponent(selectedSecondLevelItem)}` : `/api/content?type=Moadim&parsha=${encodeURIComponent(selectedSecondLevelItem)}`;
     console.log(`[${effectName}] Fetching: ${url}`);
-    setIsContentLoading(true); setBook([]); setSelectedDvar(undefined); setIsSearching(false); setSearchQuery("");
+    setIsContentLoading(true); setBook([]); setSelectedDvar(undefined);
     fetch(url)
       .then(async r => { if (!r.ok) { const txt = await r.text().catch(()=>''); throw new Error(`Content API ${r.status} for ${url}: ${txt}`);} return r.json();})
       .then(d => { const c = d.parsha?.contents || []; setBook(c); if (c.length > 0) {setSelectedDvar(c[0]); setShowFullContent(false);} else {setSelectedDvar(undefined);}})
@@ -121,12 +114,7 @@ export default function Page() {
   const handleSederChange = (value: string) => setSelectedSeder(value);
   const handleSecondLevelItemChange = (value: string) => setSelectedSecondLevelItem(value);
   const handleClickDvarTorah = (dvar: DvarTorahItem) => { setSelectedDvar(dvar); setShowFullContent(false); if (isMobile) setIsSidebarOpen(false); };
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => { /* ... same search logic ... */
-    const q = e.target.value; setSearchQuery(q); if (!q.trim()) { setIsSearching(false); setSearchResults([]); return; } setIsSearching(true);
-    const results = book.filter(dvar => dvar.title?.toLowerCase().includes(q.toLowerCase()) || dvar.summary?.toLowerCase().includes(q.toLowerCase())).map(dvar => ({ dvar, parsha: selectedSecondLevelItem, seder: selectedType === "Torah" ? selectedSeder : "Moadim", type: selectedType }));
-    setSearchResults(results);
-  };
-  const clearSearch = () => { setSearchQuery(""); setIsSearching(false); setSearchResults([]); };
+  // Search handlers removed - using global search at /search instead
   const getMainTitle = () => { /* ... same improved getMainTitle ... */
     let titleBase = selectedType === "Moadim" ? "מועדים" : selectedSeder;
     if (selectedType === "Torah") { if (!selectedSeder) titleBase = isSederListLoading ? "טוען ספרים..." : (availableSedarim.length > 0 ? "בחר ספר" : "אין ספרים זמינים");}
@@ -138,31 +126,6 @@ export default function Page() {
   // Reusable Sidebar Content Component
   const SidebarItems = () => (
     <div className="p-3 space-y-3">
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:right-2.5 rtl:left-auto" />
-        <Input type="text" placeholder="חיפוש כותרות..." value={searchQuery} onChange={handleSearch} className="w-full pl-9 rtl:pr-9"/>
-        {searchQuery && (
-          <Button variant="ghost" size="icon" onClick={clearSearch} className="absolute right-1.5 top-[3px] h-7 w-7 rtl:left-1.5 rtl:right-auto"><X className="h-4 w-4" /></Button>
-        )}
-      </div>
-
-      {isSearching ? (
-        <div className="pt-2 space-y-1">
-          <h3 className="text-sm font-medium mb-2 text-muted-foreground">תוצאות חיפוש ({searchResults.length})</h3>
-          <ScrollArea className="h-[calc(100vh-280px)]"> {/* Adjust height as needed */}
-            {searchResults.length > 0 ? (
-              searchResults.map((result) => (
-                <Button key={result.dvar.dvar_torah_id} variant="ghost" className="w-full justify-end h-auto py-1.5 px-2 text-right text-sm rounded-md hover:bg-accent/70"
-                        onClick={() => handleClickDvarTorah(result.dvar)}>
-                  <p className="truncate leading-snug w-full text-right">{result.dvar.title}</p>
-                </Button>
-              ))
-            ) : (<p className="text-xs text-muted-foreground text-center py-4">לא נמצאו תוצאות</p>)}
-          </ScrollArea>
-          <Button variant="outline" size="sm" className="w-full mt-2" onClick={clearSearch}>נקה חיפוש</Button>
-        </div>
-      ) : (
         <>
           {/* Type Selector */}
           <div className="space-y-1">
