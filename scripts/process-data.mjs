@@ -103,10 +103,33 @@ async function processAllData() {
         const currentDvar = sedarimContent[trimmedSederKey].contentByParsha[trimmedParshaKey][dvarTorahId];
         if (!currentDvar.title && hebrewTitle) currentDvar.title = hebrewTitle;
         if (!currentDvar.summary && hebrewSummary) currentDvar.summary = hebrewSummary;
-        currentDvar.contents.push({
-          passage_id: passageId || `${dvarTorahId}_p${currentDvar.contents.length + 1}`,
-          passage_content: passageText,
-        });
+
+        // Skip completely empty passage texts
+        if (!passageText || passageText.trim() === '') {
+          continue;
+        }
+
+        // Check for duplicates by passage ID or content
+        const isDuplicateId = passageId && currentDvar.contents.some(
+          existing => existing.passage_id === passageId
+        );
+
+        const isDuplicateContent = currentDvar.contents.some(
+          existing => existing.passage_content === passageText
+        );
+
+        // Skip if duplicate content or ID
+        if (!isDuplicateId && !isDuplicateContent) {
+          // Generate a unique ID if none provided or if it would be a duplicate
+          const uniquePassageId = isDuplicateId ? 
+            `${dvarTorahId}_p${currentDvar.contents.length + 1}_${Date.now().toString(36)}` : 
+            (passageId || `${dvarTorahId}_p${currentDvar.contents.length + 1}`);
+
+          currentDvar.contents.push({
+            passage_id: uniquePassageId,
+            passage_content: passageText,
+          });
+        }
 
       } else if (rowType === 'moadim') {
         const moedKeyFromMoadimColumn = row.moadim; // Using 'moadim' (Column I) as the Moed KEY
