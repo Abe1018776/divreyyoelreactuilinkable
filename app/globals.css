@@ -125,7 +125,7 @@
     width: 100%;
     direction: rtl;
   }
-  
+
   /* Ensure buttons with RTL text have proper alignment */
   button.rtl-button {
     justify-content: flex-end;
@@ -134,14 +134,14 @@
     width: 100%;
     text-align: right;
   }
-  
+
   /* Better scrolling for mobile */
   .mobile-scrollable {
     -webkit-overflow-scrolling: touch;
     overflow-y: auto;
     max-height: 100%;
   }
-  
+
   /* Add padding to prevent scrollbar from overlapping text */
   [data-radix-scroll-area-viewport] > div {
     padding-right: 16px;
