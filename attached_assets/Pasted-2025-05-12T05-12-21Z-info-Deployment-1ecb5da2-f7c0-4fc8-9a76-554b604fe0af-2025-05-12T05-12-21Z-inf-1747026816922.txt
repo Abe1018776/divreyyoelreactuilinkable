@@ -1,0 +1,178 @@
+2025-05-12T05:12:21Z info: Deployment: 1ecb5da2-f7c0-4fc8-9a76-554b604fe0af
+2025-05-12T05:12:21Z info: Build: 7327e291-3e07-4577-aa64-c40b9ed20641
+2025-05-12T05:12:21Z info: Connecting to builder
+2025-05-12T05:12:24Z info: Builder connected
+2025-05-12T05:12:25Z info: Installing packages
+--> npm install
+
+
+up to date, audited 473 packages in 4s
+
+  run `npm fund` for details
+
+
+1 critical severity vulnerability
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+npm notice
+npm notice New major version of npm available! 10.9.0 -> 11.3.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+npm notice To update run: npm install -g npm@11.3.0
+npm notice
+
+2025-05-12T05:12:29Z info: Starting Build
+
+up to date, audited 473 packages in 2s
+
+  run `npm fund` for details
+
+
+1 critical severity vulnerability
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+
+> divrei-yoel-v2@0.1.0 build
+> npm run build:data && next build
+
+
+
+> divrei-yoel-v2@0.1.0 build:data
+> node scripts/process-data.mjs
+
+
+PROCESSOR: Starting data processing...
+
+PROCESSOR: Generated types.json
+
+PROCESSOR: Parsing CSV: all_parshios_combined.csv
+
+PROCESSOR: Parsed 14459 rows from all_parshios_combined.csv
+
+PROCESSOR: Parsing CSV: all_moadim_combined.csv
+
+PROCESSOR: Parsed 18417 rows from all_moadim_combined.csv
+
+PROCESSOR: Generated sedarim.json
+
+PROCESSOR: Generated parshiot-Torah-בראשית.json
+
+PROCESSOR: Generated content-Torah-בראשית-וירא.json
+
+PROCESSOR: Generated content-Torah-בראשית-all.json
+
+PROCESSOR: Generated parshiot-Torah-שמות.json
+
+PROCESSOR: Generated content-Torah-שמות-וארא.json
+
+PROCESSOR: Generated content-Torah-שמות-בא.json
+
+PROCESSOR: Generated content-Torah-שמות-בשלח.json
+
+PROCESSOR: Generated content-Torah-שמות-יתרו.json
+
+PROCESSOR: Generated content-Torah-שמות-משפטים.json
+
+PROCESSOR: Generated content-Torah-שמות-תרומה.json
+
+PROCESSOR: Generated content-Torah-שמות-תצוה.json
+
+PROCESSOR: Generated content-Torah-שמות-ויקהל.json
+
+PROCESSOR: Generated content-Torah-שמות-פקודי.json
+
+PROCESSOR: Generated parshiot-Torah-ויקרא.json
+
+PROCESSOR: Generated content-Torah-ויקרא-ויקרא.json
+
+PROCESSOR: Generated content-Torah-ויקרא-צו.json
+
+PROCESSOR: Generated content-Torah-ויקרא-שמיני.json
+
+PROCESSOR: Generated content-Torah-ויקרא-תזריע.json
+
+PROCESSOR: Generated content-Torah-ויקרא-מצורע.json
+
+PROCESSOR: Generated content-Torah-ויקרא-אחרי.json
+
+PROCESSOR: Generated content-Torah-ויקרא-קדושים.json
+
+PROCESSOR: Generated content-Torah-ויקרא-אמור.json
+
+PROCESSOR: Generated content-Torah-ויקרא-בחקותי.json
+PROCESSOR: Generated parshiot-Torah-במדבר.json
+
+PROCESSOR: Generated content-Torah-במדבר-במדבר.json
+
+PROCESSOR: Generated content-Torah-במדבר-נשא.json
+
+PROCESSOR: Generated content-Torah-במדבר-בהעלתך.json
+
+PROCESSOR: Generated content-Torah-במדבר-שלח.json
+
+PROCESSOR: Generated parshiot-Torah-דברים.json
+
+PROCESSOR: Generated content-Torah-דברים-דברים.json
+
+PROCESSOR: Generated content-Torah-דברים-ואתחנן.json
+
+PROCESSOR: Generated content-Torah-דברים-עקב.json
+PROCESSOR: Generated content-Torah-דברים-ראה.json
+
+PROCESSOR: Generated content-Torah-דברים-שופטים.json
+
+PROCESSOR: Generated content-Torah-דברים-תצא.json
+
+PROCESSOR: Generated content-Torah-דברים-תבא.json
+
+PROCESSOR: Generated moadim.json
+
+PROCESSOR: Generated content-Moadim-חנוכה.json
+
+PROCESSOR: Generated content-Moadim-מועדים.json
+
+PROCESSOR: Generated content-Moadim-פסח.json
+
+PROCESSOR: Generated content-Moadim-פורים.json
+
+PROCESSOR: Generated content-Moadim-ראש השנה.json
+
+PROCESSOR: Generated content-Moadim-שבועות.json
+
+PROCESSOR: Generated content-Moadim-סוכות.json
+PROCESSOR: Data processing complete!
+
+  ▲ Next.js 14.2.16
+
+   Creating an optimized production build ...
+
+(node:111) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+(node:147) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ ✓ Compiled successfully
+
+   Linting and checking validity of types ...
+
+Failed to compile.
+
+
+./components/ui/calendar.tsx:5:27
+Type error: Cannot find module 'react-day-picker' or its corresponding type declarations.
+
+  3 | import * as React from "react"
+  4 | import { ChevronLeft, ChevronRight } from "lucide-react"
+> 5 | import { DayPicker } from "react-day-picker"
+    |                           ^
+  6 |
+  7 | import { cn } from "@/lib/utils"
+  8 | import { buttonVariants } from "@/components/ui/button"
