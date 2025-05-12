@@ -105,7 +105,7 @@
 
   /* Header underline styling if used */
   header.app-header {
-    @apply bg-salmon-100;
+    @apply bg-accent;
   }
   header.app-header h1::after {
     content: "";
