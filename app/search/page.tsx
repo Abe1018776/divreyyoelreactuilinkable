@@ -157,18 +157,18 @@ export default function SearchPage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:border-l border-border">
-                      <ScrollArea className="h-[calc(100vh-300px)] pr-2">
+                      <ScrollArea className="h-[calc(100vh-300px)]">
                         {searchResults.length > 0 ? (
                           <div className="space-y-2 pl-4">
                             {searchResults.map((result, index) => (
                               <Button
                                 key={`${result.dvar.dvar_torah_id}-${index}`}
                                 variant={selectedResult === result ? "secondary" : "ghost"}
-                                className="w-full justify-end h-auto py-3 px-4 text-right space-y-2 rounded-md hover:bg-accent/70"
+                                className="w-full justify-end h-auto py-3 px-4 text-right space-y-1 rounded-md hover:bg-accent/70"
                                 onClick={() => handleClickResult(result)}
                               >
                                 <div className="w-full flex flex-col items-end">
-                                  <div className="flex flex-wrap justify-end gap-1 mb-2 w-full">
+                                  <div className="flex flex-wrap justify-end gap-1 mb-1 w-full">
                                     <span className="text-xs bg-primary/10 px-2 py-1 rounded-full">
                                       {result.type === 'Torah' ? `תורה: ${result.seder} - ${result.parsha}` : `מועדים: ${result.parsha}`}
                                     </span>
@@ -177,8 +177,8 @@ export default function SearchPage() {
                                        result.matchType === 'summary' ? 'תקציר' : 'תוכן'}
                                     </span>
                                   </div>
-                                  <p className="text-sm font-semibold text-right w-full">{result.dvar.title || "ללא כותרת"}</p>
-                                  <p className="text-xs text-muted-foreground text-right w-full">{result.dvar.summary || "ללא תקציר"}</p>
+                                  <p className="text-sm font-semibold text-right w-full truncate">{result.dvar.title || "ללא כותרת"}</p>
+                                  <p className="text-xs text-muted-foreground text-right w-full truncate">{result.dvar.summary || "ללא תקציר"}</p>
                                 </div>
                               </Button>
                             ))}
