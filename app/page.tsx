@@ -239,7 +239,7 @@ export default function Page() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden"> {/* Main content and sidebar container */}
+      <div className="flex flex-1 overflow-hidden flex-row-reverse"> {/* Main content and sidebar container */}
 
         {/* Main Content Area */}
         <main className={`flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto ${isMobile && isSidebarOpen ? 'hidden' : ''}`}>
@@ -248,7 +248,7 @@ export default function Page() {
             {/* Button to open sidebar on mobile, if sidebar is not part of the main flow */}
             {isMobile && !isSidebarOpen && (
                  <Button variant="outline" size="icon" onClick={() => setIsSidebarOpen(true)} className="md:hidden">
-                     <ChevronLeft />
+                     <ChevronRight />
                  </Button>
              )}
           </div>
@@ -294,11 +294,11 @@ export default function Page() {
         </main>
 
         {/* Sidebar for Desktop - always part of the flex flow */}
-        <aside className={`hidden md:flex flex-col w-72 lg:w-80 flex-shrink-0 border-r border-border bg-card text-card-foreground rtl:border-r-0 rtl:border-l transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : 'rtl:translate-x-full ltr:-translate-x-full md:w-16'}`}>
+        <aside className={`hidden md:flex flex-col w-72 lg:w-80 flex-shrink-0 border-l border-border bg-card text-card-foreground transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full md:w-16'}`}>
             <div className={`flex ${isSidebarOpen ? 'justify-between' : 'justify-center'} items-center p-3 border-b border-border sticky top-0 bg-card z-10`}>
                 {isSidebarOpen && <h2 className="text-lg font-semibold">ניווט</h2>}
                 <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1">
-                    {isSidebarOpen ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+                    {isSidebarOpen ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
                 </Button>
             </div>
             {isSidebarOpen && <SidebarItems />}
