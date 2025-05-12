@@ -109,8 +109,10 @@ export default function SearchPage() {
     <div className={`flex flex-col h-screen bg-background text-foreground ${language === "he" ? "rtl" : "ltr"}`}>
       <header className="app-header w-full bg-white dark:bg-slate-800 border-b border-border py-4 px-6 md:px-8 shadow-sm sticky top-0 z-30">
         <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-primary dark:text-primary-foreground">חיפוש בספר דברי יואל</h1>
-          <p className="text-sm md:text-base text-muted-foreground mt-1">חיפוש בכל דברי התורה מאת רביה"ק מסאטמאר זי"ע</p>
+          <a href="/" className="block cursor-pointer transition-opacity hover:opacity-80">
+            <h1 className="text-3xl md:text-4xl font-bold text-primary dark:text-primary-foreground">חיפוש בספר דברי יואל</h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-1">חיפוש בכל דברי התורה מאת רביה"ק מסאטמאר זי"ע</p>
+          </a>
         </div>
       </header>
 
