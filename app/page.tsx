@@ -5,23 +5,21 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import { FileText, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { cn } from "@/lib/utils"; // Make sure lib/utils.ts exists
+import { ChevronRight, ChevronLeft, FileText, Search, X } from "lucide-react";
+// Note: Collapsible might not be needed for the main sidebar structure now,
+// but could be used internally if desired. Let's remove its direct import for now.
+// import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { useIsMobile } from "@/hooks/use-mobile"; // Make sure hooks/use-mobile.ts exists
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils"; // Assuming you have this for classname merging
 
-// --- Types (from our robust version) ---
+// --- Types ---
 interface PassageContent {
   passage_id: string;
   passage_content: string;
@@ -32,7 +30,7 @@ interface DvarTorahItem {
   summary: string;
   contents: PassageContent[];
 }
-interface SearchResultItem { // For client-side search
+interface SearchResultItem {
   dvar: DvarTorahItem;
   parsha: string;
   seder: string;
@@ -41,10 +39,12 @@ interface SearchResultItem { // For client-side search
 
 export default function Page() {
   const isMobile = useIsMobile();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile); // Sidebar open on desktop by default
 
-  // --- State Variables (from our robust version) ---
+  // --- State Variables (same as before) ---
   const [availableTypes] = useState<string[]>(["Torah", "Moadim"]);
   const [selectedType, setSelectedType] = useState<string>("Torah");
+  const [isTypeListLoading, setIsTypeListLoading] = useState(false);
 
   const [availableSedarim, setAvailableSedarim] = useState<string[]>([]);
   const [selectedSeder, setSelectedSeder] = useState<string>("");
@@ -59,314 +59,264 @@ export default function Page() {
   const [isContentLoading, setIsContentLoading] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile); // From our robust version
+  const [language, setLanguage] = useState<"en" | "he">("he"); // Keep if needed
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-
-  // --- Data Fetching useEffects (from our robust version) ---
+  // --- Data Fetching useEffects (same robust versions as before) ---
   useEffect(() => { /* Effect 2: Fetch Sedarim or Moadim list */
-    console.log("Effect 2 Triggered: selectedType =", selectedType);
-    setSelectedSeder(""); setAvailableSedarim([]);
-    setSelectedSecondLevelItem(""); setAvailableSecondLevelItems([]);
-    setBook([]); setSelectedDvar(undefined); setIsSearching(false); setSearchQuery("");
-
+    // ... (Your complete Effect 2 code with detailed logging)
+    const effectName = "Effect 2 (Type Change)"; console.log(`\n[${effectName}] Triggered. selectedType:`, selectedType);
+    setSelectedSeder(""); setAvailableSedarim([]); setSelectedSecondLevelItem(""); setAvailableSecondLevelItems([]); setBook([]); setSelectedDvar(undefined); setIsSearching(false); setSearchQuery("");
     if (selectedType === "Torah") {
-      setIsSederListLoading(true);
-      fetch('/api/sedarim')
-        .then(res => res.ok ? res.json() : Promise.reject(new Error(`API error: ${res.status}`)))
-        .then(data => { const list = data.sedarim || []; setAvailableSedarim(list); if (list.length > 0) setSelectedSeder(list[0]); })
-        .catch(err => { console.error("PAGE: Failed to fetch Sedarim:", err); setAvailableSedarim([]); })
+      setIsSederListLoading(true); fetch('/api/sedarim')
+        .then(async r => { if (!r.ok) { const txt = await r.text().catch(()=>''); throw new Error(`Sedarim API ${r.status}: ${txt}`);} return r.json();})
+        .then(d => { const l = d.sedarim || []; setAvailableSedarim(l); if (l.length > 0) setSelectedSeder(l[0]); else setSelectedSeder("");})
+        .catch(e => { console.error(e); setAvailableSedarim([]); setSelectedSeder(""); })
         .finally(() => setIsSederListLoading(false));
     } else if (selectedType === "Moadim") {
-      setIsSecondLevelListLoading(true);
-      fetch(`/api/parshiot?type=Moadim`)
-        .then(res => res.ok ? res.json() : Promise.reject(new Error(`API error: ${res.status}`)))
-        .then(data => { const list = data.parshiot || []; setAvailableSecondLevelItems(list); if (list.length > 0) setSelectedSecondLevelItem(list[0]); })
-        .catch(err => { console.error("PAGE: Failed to fetch Moadim list:", err); setAvailableSecondLevelItems([]); })
+      setIsSecondLevelListLoading(true); fetch(`/api/parshiot?type=Moadim`)
+        .then(async r => { if (!r.ok) { const txt = await r.text().catch(()=>''); throw new Error(`Moadim List API ${r.status}: ${txt}`);} return r.json();})
+        .then(d => { const l = d.parshiot || []; setAvailableSecondLevelItems(l); if (l.length > 0) setSelectedSecondLevelItem(l[0]); else setSelectedSecondLevelItem("");})
+        .catch(e => { console.error(e); setAvailableSecondLevelItems([]); setSelectedSecondLevelItem("");})
         .finally(() => setIsSecondLevelListLoading(false));
     }
   }, [selectedType]);
 
   useEffect(() => { /* Effect 3: Fetch Parshiot for Torah */
-    console.log("Effect 3 Triggered: selectedType =", selectedType, "selectedSeder =", selectedSeder);
-    if (selectedType !== "Torah" || !selectedSeder) {
-      if (selectedType !== "Torah") { setAvailableSecondLevelItems([]); setSelectedSecondLevelItem(""); } return;
-    }
-    setSelectedSecondLevelItem(""); setAvailableSecondLevelItems([]);
-    setBook([]); setSelectedDvar(undefined); setIsSearching(false); setSearchQuery("");
-    setIsSecondLevelListLoading(true);
+    // ... (Your complete Effect 3 code with detailed logging)
+    const effectName = "Effect 3 (Seder Change)"; console.log(`\n[${effectName}] Triggered. Type: ${selectedType}, Seder: ${selectedSeder}`);
+    if (selectedType !== "Torah" || !selectedSeder) { if (selectedType !== "Torah") {setAvailableSecondLevelItems([]); setSelectedSecondLevelItem("");} return; }
+    setSelectedSecondLevelItem(""); setAvailableSecondLevelItems([]); setBook([]); setSelectedDvar(undefined); setIsSearching(false); setSearchQuery(""); setIsSecondLevelListLoading(true);
     fetch(`/api/parshiot?type=Torah&seder=${encodeURIComponent(selectedSeder)}`)
-      .then(res => res.ok ? res.json() : Promise.reject(new Error(`API error: ${res.status}`)))
-      .then(data => { const list = data.parshiot || []; setAvailableSecondLevelItems(list); if (list.length > 0) setSelectedSecondLevelItem(list[0]); })
-      .catch(err => { console.error(`PAGE: Failed to Parshiot for ${selectedSeder}:`, err); setAvailableSecondLevelItems([]); })
+      .then(async r => { if (!r.ok) { const txt = await r.text().catch(()=>''); throw new Error(`Parshiot API ${r.status}: ${txt}`);} return r.json();})
+      .then(d => { const l = d.parshiot || []; setAvailableSecondLevelItems(l); if (l.length > 0) setSelectedSecondLevelItem(l[0]); else setSelectedSecondLevelItem("");})
+      .catch(e => { console.error(e); setAvailableSecondLevelItems([]); setSelectedSecondLevelItem("");})
       .finally(() => setIsSecondLevelListLoading(false));
   }, [selectedType, selectedSeder]);
 
   useEffect(() => { /* Effect 4: Fetch Content */
-    console.log("Effect 4 Triggered: Type=", selectedType, "Seder=", selectedSeder, "Item=", selectedSecondLevelItem);
-    console.log("Current availableSecondLevelItems:", availableSecondLevelItems);
-
+    // ... (Your complete Effect 4 code with detailed logging and refined guards)
+    const effectName = "Effect 4 (Item Change)"; console.log(`\n[${effectName}] Triggered. Type: ${selectedType}, Seder: ${selectedSeder}, Item: ${selectedSecondLevelItem}`);
     if (!selectedType || !selectedSecondLevelItem) { setBook([]); setSelectedDvar(undefined); return; }
     if (selectedType === "Torah" && !selectedSeder) { setBook([]); setSelectedDvar(undefined); return; }
+    if (availableSecondLevelItems.length > 0 && !availableSecondLevelItems.includes(selectedSecondLevelItem)) { setBook([]); setSelectedDvar(undefined); return; }
+    if (isSecondLevelListLoading && availableSecondLevelItems.length === 0 && selectedSecondLevelItem) { return; }
 
-    // Guard against stale selectedSecondLevelItem
-    if (availableSecondLevelItems.length > 0 && !availableSecondLevelItems.includes(selectedSecondLevelItem)) {
-        console.warn(`Effect 4: Stale item ('${selectedSecondLevelItem}'). Valid items:`, availableSecondLevelItems, ". Aborting content fetch.");
-        setBook([]); setSelectedDvar(undefined);
-        return;
-    }
-    if (isSecondLevelListLoading && availableSecondLevelItems.length === 0 && selectedSecondLevelItem) {
-        console.warn(`Effect 4: List for second level items still loading, but an item ('${selectedSecondLevelItem}') is selected. Waiting for list to populate.`);
-        // setBook([]); setSelectedDvar(undefined); // Optional: clear if you want to be very strict
-        return;
-    }
-
-
-    const url = selectedType === "Torah"
-        ? `/api/content?type=Torah&seder=${encodeURIComponent(selectedSeder)}&parsha=${encodeURIComponent(selectedSecondLevelItem)}`
-        : `/api/content?type=Moadim&parsha=${encodeURIComponent(selectedSecondLevelItem)}`;
-
-    console.log("Effect 4: Fetching URL:", url);
+    const url = selectedType === "Torah" ? `/api/content?type=Torah&seder=${encodeURIComponent(selectedSeder)}&parsha=${encodeURIComponent(selectedSecondLevelItem)}` : `/api/content?type=Moadim&parsha=${encodeURIComponent(selectedSecondLevelItem)}`;
+    console.log(`[${effectName}] Fetching: ${url}`);
     setIsContentLoading(true); setBook([]); setSelectedDvar(undefined); setIsSearching(false); setSearchQuery("");
     fetch(url)
-      .then(res => res.ok ? res.json() : Promise.reject(new Error(`API error: ${res.status}`)))
-      .then(data => {
-        const contents = data.parsha?.contents || [];
-        setBook(contents);
-        if (contents.length > 0) { setSelectedDvar(contents[0]); setShowFullContent(false); }
-      })
-      .catch(err => { console.error(`PAGE: Failed to fetch content from ${url}:`, err); setBook([]); setSelectedDvar(undefined); })
+      .then(async r => { if (!r.ok) { const txt = await r.text().catch(()=>''); throw new Error(`Content API ${r.status} for ${url}: ${txt}`);} return r.json();})
+      .then(d => { const c = d.parsha?.contents || []; setBook(c); if (c.length > 0) {setSelectedDvar(c[0]); setShowFullContent(false);} else {setSelectedDvar(undefined);}})
+      .catch(e => { console.error(e); setBook([]); setSelectedDvar(undefined);})
       .finally(() => setIsContentLoading(false));
-  }, [selectedType, selectedSeder, selectedSecondLevelItem, availableSecondLevelItems, isSecondLevelListLoading]); // Added dependencies
+  }, [selectedType, selectedSeder, selectedSecondLevelItem, availableSecondLevelItems, isSecondLevelListLoading]);
 
-  // --- Handler Functions (from our robust version, adapted for Shadcn Select) ---
+
+  // --- Handler Functions ---
   const handleTypeChange = (value: string) => setSelectedType(value);
   const handleSederChange = (value: string) => setSelectedSeder(value);
   const handleSecondLevelItemChange = (value: string) => setSelectedSecondLevelItem(value);
-
-  const handleClickDvarTorah = (dvar: DvarTorahItem) => {
-    setSelectedDvar(dvar);
-    setShowFullContent(false);
-    if (isMobile) setIsSidebarOpen(false);
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => { /* ... same client-side search ... */
-    const q = e.target.value;
-    setSearchQuery(q);
-    if (!q.trim()) { setIsSearching(false); setSearchResults([]); return; }
-    setIsSearching(true);
-    const results = book.filter(dvar =>
-        dvar.title?.toLowerCase().includes(q.toLowerCase()) ||
-        dvar.summary?.toLowerCase().includes(q.toLowerCase())
-        // Add content search if needed: dvar.contents?.some(p => p.passage_content.toLowerCase().includes(q.toLowerCase()))
-    ).map(dvar => ({ dvar, parsha: selectedSecondLevelItem, seder: selectedType === "Torah" ? selectedSeder : "Moadim", type: selectedType }));
+  const handleClickDvarTorah = (dvar: DvarTorahItem) => { setSelectedDvar(dvar); setShowFullContent(false); if (isMobile) setIsSidebarOpen(false); };
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => { /* ... same search logic ... */
+    const q = e.target.value; setSearchQuery(q); if (!q.trim()) { setIsSearching(false); setSearchResults([]); return; } setIsSearching(true);
+    const results = book.filter(dvar => dvar.title?.toLowerCase().includes(q.toLowerCase()) || dvar.summary?.toLowerCase().includes(q.toLowerCase())).map(dvar => ({ dvar, parsha: selectedSecondLevelItem, seder: selectedType === "Torah" ? selectedSeder : "Moadim", type: selectedType }));
     setSearchResults(results);
   };
   const clearSearch = () => { setSearchQuery(""); setIsSearching(false); setSearchResults([]); };
-
-  const getMainTitle = () => { /* ... same improved version from our robust page ... */
+  const getMainTitle = () => { /* ... same improved getMainTitle ... */
     let titleBase = selectedType === "Moadim" ? "מועדים" : selectedSeder;
-    if (selectedType === "Torah") {
-        if (!selectedSeder) titleBase = isSederListLoading ? "טוען ספרים..." : (availableSedarim.length > 0 ? "בחר ספר" : "אין ספרים זמינים");
-    } else { 
-        if (availableSecondLevelItems.length === 0 && !isSecondLevelListLoading && selectedType === "Moadim") titleBase = "מועדים - אין מועדים זמינים";
-        else if (isSecondLevelListLoading && availableSecondLevelItems.length === 0 && selectedType === "Moadim") titleBase = "טוען מועדים...";
-    }
-
-    if (selectedSecondLevelItem) {
-      return `${titleBase || (selectedType === "Torah" ? selectedSeder : "מועדים")} - ${selectedSecondLevelItem}`;
-    }
+    if (selectedType === "Torah") { if (!selectedSeder) titleBase = isSederListLoading ? "טוען ספרים..." : (availableSedarim.length > 0 ? "בחר ספר" : "אין ספרים זמינים");}
+    else { if (availableSecondLevelItems.length === 0 && !isSecondLevelListLoading && selectedType === "Moadim") titleBase = "מועדים - אין מועדים זמינים"; else if (isSecondLevelListLoading && availableSecondLevelItems.length === 0 && selectedType === "Moadim") titleBase = "טוען מועדים...";}
+    if (selectedSecondLevelItem) return `${titleBase || (selectedType === "Torah" ? selectedSeder : "מועדים")} - ${selectedSecondLevelItem}`;
     return titleBase || (selectedType === "Torah" ? "טוען..." : "טוען מועדים...");
   };
 
-  // --- JSX (Structure from your "ugly UI" version, logic from robust version) ---
+  // Reusable Sidebar Content Component
+  const SidebarItems = () => (
+    <div className="p-3 space-y-3">
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:right-2.5 rtl:left-auto" />
+        <Input type="text" placeholder="חיפוש כותרות..." value={searchQuery} onChange={handleSearch} className="w-full pl-9 rtl:pr-9"/>
+        {searchQuery && (
+          <Button variant="ghost" size="icon" onClick={clearSearch} className="absolute right-1.5 top-[3px] h-7 w-7 rtl:left-1.5 rtl:right-auto"><X className="h-4 w-4" /></Button>
+        )}
+      </div>
+
+      {isSearching ? (
+        <div className="pt-2 space-y-1">
+          <h3 className="text-sm font-medium mb-2 text-muted-foreground">תוצאות חיפוש ({searchResults.length})</h3>
+          <ScrollArea className="h-[calc(100vh-280px)]"> {/* Adjust height as needed */}
+            {searchResults.length > 0 ? (
+              searchResults.map((result) => (
+                <Button key={result.dvar.dvar_torah_id} variant="ghost" className="w-full justify-start h-auto py-1.5 px-2 text-right text-sm rounded-md hover:bg-accent/70"
+                        onClick={() => handleClickDvarTorah(result.dvar)}>
+                  <p className="truncate leading-snug">{result.dvar.title}</p>
+                </Button>
+              ))
+            ) : (<p className="text-xs text-muted-foreground text-center py-4">לא נמצאו תוצאות</p>)}
+          </ScrollArea>
+          <Button variant="outline" size="sm" className="w-full mt-2" onClick={clearSearch}>נקה חיפוש</Button>
+        </div>
+      ) : (
+        <>
+          {/* Type Selector */}
+          <div className="space-y-1">
+            <label htmlFor="type-select-sidebar" className="text-xs font-medium text-muted-foreground">סוג</label>
+            <Select value={selectedType} onValueChange={handleTypeChange}>
+              <SelectTrigger id="type-select-sidebar"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {availableTypes.map(typeOpt => <SelectItem key={typeOpt} value={typeOpt}>{typeOpt === "Torah" ? "תורה" : "מועדים"}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Seder Selector */}
+          {selectedType === "Torah" && (
+            <div className="space-y-1">
+              <label htmlFor="seder-select-sidebar" className="text-xs font-medium text-muted-foreground">ספר</label>
+              <Select value={selectedSeder} onValueChange={handleSederChange} disabled={isSederListLoading || availableSedarim.length === 0}>
+                <SelectTrigger id="seder-select-sidebar"><SelectValue placeholder={isSederListLoading ? "טוען..." : "בחר ספר"} /></SelectTrigger>
+                <SelectContent>
+                  {isSederListLoading ? <SelectItem value="loading_s" disabled>טוען...</SelectItem> :
+                   availableSedarim.length === 0 ? <SelectItem value="no_s" disabled>אין ספרים</SelectItem> :
+                   availableSedarim.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Parsha/Moed Selector */}
+          <div className="space-y-1">
+            <label htmlFor="item-select-sidebar" className="text-xs font-medium text-muted-foreground">
+              {selectedType === "Torah" ? (selectedSeder ? "פרשה" : "בחר ספר") : "מועד"}
+            </label>
+            <Select value={selectedSecondLevelItem} onValueChange={handleSecondLevelItemChange}
+                    disabled={isSecondLevelListLoading || availableSecondLevelItems.length === 0 || (selectedType === "Torah" && !selectedSeder)}>
+              <SelectTrigger id="item-select-sidebar"><SelectValue placeholder={isSecondLevelListLoading ? "טוען..." : `בחר ${selectedType === "Torah" ? "פרשה" : "מועד"}`} /></SelectTrigger>
+              <SelectContent>
+                {isSecondLevelListLoading ? <SelectItem value="loading_i" disabled>טוען...</SelectItem> :
+                 availableSecondLevelItems.length === 0 ? <SelectItem value="no_i" disabled>אין {selectedType === "Torah" ? "פרשיות" : "מועדים"}</SelectItem> :
+                 availableSecondLevelItems.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Separator className="my-2" />
+
+          <div className="text-sm font-semibold text-muted-foreground mb-1">דברי תורה</div>
+          {/* Dvar Torah List - This ScrollArea should be flex-1 if it's the last expanding element */}
+          <ScrollArea className="flex-1 min-h-[200px]">
+            <div className="space-y-1">
+              {isContentLoading && book.length === 0 ? (<p className="text-xs text-muted-foreground text-center py-2">טוען...</p>)
+               : book.length > 0 ? (
+                book.map((dvar) => (
+                  <Button key={dvar.dvar_torah_id} variant={selectedDvar?.dvar_torah_id === dvar.dvar_torah_id ? "secondary" : "ghost"}
+                          className="w-full justify-start h-auto py-1.5 px-2 text-right text-sm rounded-md"
+                          onClick={() => handleClickDvarTorah(dvar)}>
+                    <p className="truncate leading-snug">{dvar.title || "ללא כותרת"}</p>
+                  </Button>
+                ))
+              ) : selectedSecondLevelItem ? (<p className="text-xs text-muted-foreground text-center py-4">אין דברי תורה</p>)
+                : (<p className="text-xs text-muted-foreground text-center py-4">{selectedType === "Torah" && !selectedSeder ? "בחר ספר" : "בחר פריט"}</p>)}
+            </div>
+          </ScrollArea>
+        </>
+      )}
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 dark:bg-slate-900 dark:text-slate-50"> {/* Added dark mode base */}
-      {/* Banner */}
-      <header className="bg-white dark:bg-slate-800 shadow sticky top-0 z-50"> {/* Made header sticky */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100">
-            ספר דברי יואל – אוסף דברי תורה
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-            דברי תורה מאת רביה"ק מסאטמאר זי"ע
-          </p>
+    <div className={`flex flex-col h-screen bg-background text-foreground ${language === "he" ? "rtl" : "ltr"}`}>
+      <header className="app-header w-full bg-white dark:bg-slate-800 border-b border-border py-4 px-6 md:px-8 shadow-sm sticky top-0 z-30">
+        <div className="max-w-5xl mx-auto text-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-primary dark:text-primary-foreground">ספר דברי יואל - אוסף דברי תורה</h1>
+          <p className="text-sm md:text-base text-muted-foreground mt-1">דברי תורה מאת רביה"ק מסאטמאר זי"ע</p>
         </div>
       </header>
 
-      {/* Two‑column grid (sidebar first for RTL, main content second) */}
-      {/* On mobile, sidebar becomes a collapsible overlay */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row-reverse gap-6"> {/* flex-row-reverse for RTL sidebar on right */}
+      <div className="flex flex-1 overflow-hidden"> {/* Main content and sidebar container */}
 
-        {/* Sidebar Area */}
-        <div className={`md:w-80 lg:w-96 flex-shrink-0 ${isMobile && !isSidebarOpen ? 'hidden' : ''} ${isMobile ? 'fixed inset-0 bg-background/80 backdrop-blur-sm z-40 h-full overflow-y-auto' : ''}`}>
-          <aside className={`flex flex-col space-y-4 h-full ${isMobile ? 'bg-card p-4 shadow-xl' : 'sticky top-[calc(theme(spacing.16)+1px)] h-[calc(100vh-theme(spacing.16)-2rem)]'}`}> {/* Sticky desktop sidebar */}
-            {isMobile && (
-                <div className="flex justify-between items-center">
-                    <h2 className="text-lg font-semibold">ניווט</h2>
-                    <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(false)}><X className="h-5 w-5"/></Button>
-                </div>
-            )}
-            {!isMobile && <h2 className="text-xl font-semibold pt-2">ניווט</h2>}
-
-
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 rtl:right-3 rtl:left-auto" />
-              <Input placeholder="חיפוש כותרות..." className="pl-10 rtl:pr-10" value={searchQuery} onChange={handleSearch} />
-              {searchQuery && (
-                <Button variant="ghost" size="icon" className="absolute right-1.5 top-1/2 -translate-y-1/2 h-7 w-7 rtl:left-1.5 rtl:right-auto" onClick={clearSearch}><X className="h-4 w-4" /></Button>
-              )}
-            </div>
-
-            {isSearching ? (
-              <div className="pt-2 space-y-1 flex-1 overflow-y-auto">
-                <h3 className="text-base font-medium mb-2">תוצאות חיפוש ({searchResults.length})</h3>
-                <ScrollArea className="h-[calc(100%-4rem)]"> {/* Adjust height */}
-                    {searchResults.length > 0 ? (
-                    searchResults.map((result) => (
-                        <Button key={result.dvar.dvar_torah_id} variant="ghost" className="w-full justify-start h-auto py-1.5 px-2 text-right text-sm"
-                                onClick={() => handleClickDvarTorah(result.dvar)}>
-                        <p className="truncate">{result.dvar.title}</p>
-                        </Button>
+        {/* Main Content Area */}
+        <main className={`flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto ${isMobile && isSidebarOpen ? 'hidden' : ''}`}>
+           <div className="flex justify-between items-center mb-2">
+            <h2 className="text-xl sm:text-2xl font-semibold text-slate-800 dark:text-slate-200">{getMainTitle()}</h2>
+            {/* Button to open sidebar on mobile, if sidebar is not part of the main flow */}
+            {isMobile && !isSidebarOpen && (
+                 <Button variant="outline" size="icon" onClick={() => setIsSidebarOpen(true)} className="md:hidden">
+                     <ChevronLeft />
+                 </Button>
+             )}
+          </div>
+          {isContentLoading && !selectedDvar && selectedSecondLevelItem ? (
+            <div className="flex justify-center items-center h-64"><p className="text-lg text-muted-foreground">טוען תוכן...</p></div>
+          ) : selectedDvar ? (
+            <>
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 text-slate-700 dark:text-slate-300">{selectedDvar.title || "ללא כותרת"}</h3>
+              <Separator className="my-3" />
+              <ScrollArea className="h-[calc(100vh-230px)] md:h-[calc(100vh-210px)] text-base">
+                {showFullContent ? (
+                  selectedDvar.contents?.length > 0 ? (
+                    selectedDvar.contents.map((passage, index) => (
+                      <p key={passage.passage_id || index} dir="rtl" className="mb-3 leading-relaxed my-font">{passage.passage_content}</p>
                     ))
-                    ) : (<p className="text-xs text-muted-foreground text-center py-4">לא נמצאו תוצאות</p>)}
-                </ScrollArea>
-                <Button variant="outline" size="sm" className="w-full mt-2" onClick={clearSearch}>נקה חיפוש</Button>
-              </div>
-            ) : (
-              <>
-                {/* Type selector */}
-                <div className="space-y-1">
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">סוג</label>
-                  <Select value={selectedType} onValueChange={handleTypeChange}>
-                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {availableTypes.map((t) => (<SelectItem key={t} value={t}>{t === "Torah" ? "תורה" : "מועדים"}</SelectItem>))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Seder selector */}
-                {selectedType === "Torah" && (
-                  <div className="space-y-1">
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">ספר</label>
-                    <Select value={selectedSeder} onValueChange={handleSederChange} disabled={isSederListLoading || availableSedarim.length === 0}>
-                      <SelectTrigger className="w-full"><SelectValue placeholder={isSederListLoading ? "טוען..." : "בחר ספר"} /></SelectTrigger>
-                      <SelectContent>
-                        {isSederListLoading ? <SelectItem value="loading" disabled>טוען...</SelectItem> :
-                         availableSedarim.length === 0 ? <SelectItem value="no-options" disabled>אין ספרים</SelectItem> :
-                         availableSedarim.map((s) => (<SelectItem key={s} value={s}>{s}</SelectItem>))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                {/* Parsha/Moed selector */}
-                <div className="space-y-1">
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{selectedType === "Torah" ? (selectedSeder ? "פרשה" : "בחר ספר") : "מועד"}</label>
-                  <Select value={selectedSecondLevelItem} onValueChange={handleSecondLevelItemChange} disabled={isSecondLevelListLoading || availableSecondLevelItems.length === 0 || (selectedType === "Torah" && !selectedSeder)}>
-                    <SelectTrigger className="w-full"><SelectValue placeholder={isSecondLevelListLoading ? "טוען..." : `בחר ${selectedType === "Torah" ? "פרשה" : "מועד"}`} /></SelectTrigger>
-                    <SelectContent>
-                      {isSecondLevelListLoading ? <SelectItem value="loading" disabled>טוען...</SelectItem> :
-                       availableSecondLevelItems.length === 0 ? <SelectItem value="no-options" disabled>אין {selectedType === "Torah" ? "פרשיות" : "מועדים"}</SelectItem> :
-                       availableSecondLevelItems.map((i) => (<SelectItem key={i} value={i}>{i}</SelectItem>))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Separator className="my-3"/>
-
-                {/* Dvar Torah list */}
-                <div className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">דברי תורה</div>
-                <ScrollArea className="flex-1 min-h-[200px]"> {/* Allow scroll area to grow */}
-                  <div className="flex flex-col space-y-1 pr-1">
-                    {isContentLoading && book.length === 0 ? <p className="text-xs text-muted-foreground text-center py-2">טוען...</p> :
-                     book.length > 0 ? (
-                      book.map((d) => (
-                        <Button
-                          key={d.dvar_torah_id}
-                          variant={selectedDvar?.dvar_torah_id === d.dvar_torah_id ? "secondary" : "ghost"} // Use secondary for selected
-                          className="w-full justify-start h-auto py-1.5 px-2 text-right text-sm"
-                          onClick={() => handleClickDvarTorah(d)}
-                        >
-                          <p className="truncate leading-snug">{d.title || "ללא כותרת"}</p>
+                  ) : (<p dir="rtl" className="text-muted-foreground">אין תוכן מלא זמין.</p>)
+                ) : (
+                  <>
+                    <p dir="rtl" className="mb-4 leading-relaxed text-muted-foreground">{selectedDvar.summary || "אין תקציר זמין."}</p>
+                    {selectedDvar.contents?.length > 0 && (
+                      <div className="mt-6 text-center">
+                        <Button variant="outline" onClick={() => setShowFullContent(true)}>
+                          <FileText className="ml-2 h-4 w-4" />קרא את כל דבר התורה
                         </Button>
-                      ))
-                    ) : selectedSecondLevelItem ? (
-                      <p className="text-xs text-muted-foreground text-center py-4">אין דברי תורה עבור בחירה זו.</p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground text-center py-4">
-                        {selectedType === "Torah" && !selectedSeder ? "בחר ספר תחילה." : "בחר פריט להצגת דברי תורה."}
-                      </p>
+                      </div>
                     )}
-                  </div>
-                </ScrollArea>
-              </>
-            )}
-          </aside>
-        </div>
-
-        {/* Mobile Sidebar Toggle Button - Placed outside the main grid flow, fixed position */}
-        {isMobile && !isSidebarOpen && (
-            <Button 
-                variant="outline" 
-                size="icon" 
-                className="fixed bottom-4 right-4 z-50 shadow-lg md:hidden" // Show only on mobile when sidebar is closed
-                onClick={() => setIsSidebarOpen(true)}
-            >
-                <ChevronLeft /> {/* Icon for opening from right */}
-            </Button>
-        )}
-
-        {/* Main content area (This is where the Dvar Torah summary/full text goes) */}
-        <div className={`flex-1 overflow-y-auto p-6 md:p-8 bg-white dark:bg-slate-800/50 md:rounded-lg md:shadow ${isMobile && isSidebarOpen ? 'hidden' : ''}`}> {/* Hide main content on mobile if sidebar is open */}
-           <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-slate-800 dark:text-slate-200">{getMainTitle()}</h2>
-           {isContentLoading && !selectedDvar && selectedSecondLevelItem ? (
-              <div className="flex justify-center items-center h-64"><p className="text-lg text-muted-foreground">טוען תוכן...</p></div>
-            ) : selectedDvar ? (
-              <>
-                <h3 className="text-lg sm:text-xl font-semibold mb-3 text-slate-700 dark:text-slate-300">{selectedDvar.title || "ללא כותרת"}</h3>
-                <Separator className="my-4" />
-                <article className={cn("prose prose-sm sm:prose-base max-w-none dark:prose-invert", showFullContent && "my-font")}> {/* Apply .my-font for Rashi when full content */}
-                  {showFullContent ? (
-                    selectedDvar.contents?.length > 0 ? (
-                      selectedDvar.contents.map((passage) => (
-                        <p key={passage.passage_id} dir="rtl" className="mb-3 leading-relaxed">
-                          {passage.passage_content}
-                        </p>
-                      ))
-                    ) : (<p dir="rtl" className="text-muted-foreground">אין תוכן מלא זמין.</p>)
-                  ) : (
-                    <>
-                      <p dir="rtl" className="mb-4 leading-relaxed text-muted-foreground">{selectedDvar.summary || "אין תקציר זמין."}</p>
-                      {selectedDvar.contents?.length > 0 && (
-                        <div className="mt-6 text-center">
-                          <Button variant="outline" onClick={() => setShowFullContent(true)}>
-                            <FileText className="ml-2 h-4 w-4" /> קרא את כל דבר התורה
-                          </Button>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </article>
-              </>
-            ) : (
-              <div className="flex justify-center items-center h-64">
-                <p className="text-lg text-muted-foreground">
-                  {/* ... (same empty/loading messages as before) ... */}
+                  </>
+                )}
+              </ScrollArea>
+            </>
+          ) : (
+            <div className="flex justify-center items-center h-64">
+              <p className="text-lg text-muted-foreground">
                    {selectedSecondLevelItem ? "לא נמצאו דברי תורה עבור בחירה זו."
                     : (selectedType === "Torah" && !selectedSeder && !isSederListLoading && availableSedarim.length === 0) ? "אין ספרים זמינים."
                     : (selectedType === "Torah" && !selectedSeder) ? "בחר ספר מהניווט."
                     : (selectedType === "Moadim" && availableSecondLevelItems.length === 0 && !isSecondLevelListLoading) ? "אין מועדים זמינים."
                     : isSecondLevelListLoading || isSederListLoading || isContentLoading ? "טוען..."
                     : "בחר פריט מהניווט להצגת תוכן."}
-                </p>
-              </div>
-            )}
-        </div>
+              </p>
+            </div>
+          )}
+        </main>
+
+        {/* Sidebar for Desktop - always part of the flex flow */}
+        <aside className={`hidden md:flex flex-col w-72 lg:w-80 flex-shrink-0 border-r border-border bg-card text-card-foreground rtl:border-r-0 rtl:border-l transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : 'rtl:translate-x-full ltr:-translate-x-full md:w-16'}`}>
+            <div className={`flex ${isSidebarOpen ? 'justify-between' : 'justify-center'} items-center p-3 border-b border-border sticky top-0 bg-card z-10`}>
+                {isSidebarOpen && <h2 className="text-lg font-semibold">ניווט</h2>}
+                <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1">
+                    {isSidebarOpen ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+                </Button>
+            </div>
+            {isSidebarOpen && <SidebarItems />}
+        </aside>
+
+        {/* Mobile Sidebar (Overlay) */}
+        {isMobile && isSidebarOpen && (
+            <>
+                <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setIsSidebarOpen(false)}></div>
+                <aside className="fixed top-0 right-0 h-full w-4/5 max-w-xs bg-card text-card-foreground shadow-xl flex flex-col z-40 md:hidden overflow-y-auto">
+                    <div className="flex justify-between items-center p-3 border-b border-border sticky top-0 bg-card z-10">
+                        <h2 className="text-lg font-semibold">ניווט</h2>
+                        <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(false)}><X className="h-5 w-5"/></Button>
+                    </div>
+                    <SidebarItems />
+                </aside>
+            </>
+        )}
       </div>
     </div>
   );
