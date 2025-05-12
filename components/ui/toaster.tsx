@@ -1,7 +1,7 @@
 
 "use client"
 
-import { Toaster as SonnerToaster } from "sonner"
+import { Toaster as SonnerToaster, Toast } from "sonner"
 import { useTheme } from "next-themes"
 
 export function Toaster() {
