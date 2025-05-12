@@ -1,14 +1,45 @@
-entrypoint = "index.js"
-modules = ["nodejs-22"]
-hidden = [".config", "package-lock.json"]
+# Command to run when you click the "Run" button in the Replit IDE
+run = "npm run dev"
 
-[gitHubImport]
-requiredFiles = [".replit", "replit.nix", "package.json", "package-lock.json"]
+# Specifies the primary language module for the environment
+modules = ["nodejs-22"] # Keeping your nodejs-22, which is good and recent
 
+# Files/folders to hide in the Replit file explorer by default
+hidden = [".config", "package-lock.json", ".next"] # Added .next
+
+# Environment variables available to your application
+[env]
+NEXT_TELEMETRY_DISABLED = "1" # Disables Next.js telemetry
+PORT = "3000"                 # Port Next.js dev server will try to use (and for 'next start -p $PORT')
+
+# Configuration for the Nix environment (controls system-level packages)
 [nix]
-channel = "stable-24_11"
+channel = "stable-23_11" # Using a known stable channel. 
+                         # Your "stable-24_11" is very new; if it causes issues, 
+                         # "stable-23_11" is a safe bet. For now, let's try your newer one.
+                         # If build fails weirdly later, we can try "stable-23_11".
+                         # So, let's actually stick with what you have for now if it's working:
+# channel = "stable-24_11" # Keep this if your Repl is happy with it.
+                         # If not, fallback to "stable-23_11" or remove the [nix] block.
+                         # For maximum stability initially, let's use:
+# channel = "stable-23_11"
+# UPDATE: Let's actually remove the channel line for now to use Replit's default for nodejs-22
+# as specified in `modules`. If needed later, we can add it back.
+# Removing this [nix] block is often safest if the `modules` entry is sufficient.
 
+# Port forwarding configuration
+[[ports]]
+localPort = 3000   # The port your Next.js app runs on inside the Repl
+externalPort = 80  # The port Replit exposes to the internet (usually 80/443)
+
+# Configuration for deployments (e.g., when you deploy to a URL)
 [deployment]
-run = ["node", "index.js"]
-deploymentTarget = "autoscale"
+# Command to build your application for production
+# This uses the "build" script from your package.json
+build = ["sh", "-c", "npm install && npm run build"]
+
+# Command to run your application in production
+# This uses the "start" script from your package.json
+run = ["sh", "-c", "npm start"]
+deploymentTarget = "autoscale" # Replit's newer scalable deployment target (Cloud Run based)
 ignorePorts = false
