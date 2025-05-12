@@ -169,7 +169,7 @@ export default function SearchPage() {
                               >
                                 <div className="w-full flex flex-col items-end">
                                   <div className="flex flex-wrap justify-end gap-1 mb-1 w-full">
-                                    <span className="text-xs bg-primary/10 px-2 py-1 rounded-full">
+                                    <span className="text-xs bg-primary/10 px-2 py-1 rounded-full break-words max-w-full">
                                       {result.type === 'Torah' ? `תורה: ${result.seder} - ${result.parsha}` : `מועדים: ${result.parsha}`}
                                     </span>
                                     <span className="text-xs bg-secondary/20 px-2 py-1 rounded-full">
@@ -194,7 +194,7 @@ export default function SearchPage() {
                         <>
                           <div className="mb-4">
                             <div className="flex flex-wrap justify-end gap-1 mb-2">
-                              <span className="text-xs bg-primary/10 px-2 py-1 rounded-full">
+                              <span className="text-xs bg-primary/10 px-2 py-1 rounded-full break-words max-w-full">
                                 {selectedResult.type === 'Torah' ? 
                                   `תורה: ${selectedResult.seder} - ${selectedResult.parsha}` : 
                                   `מועדים: ${selectedResult.parsha}`}
