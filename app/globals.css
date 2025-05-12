@@ -134,3 +134,10 @@
     width: 100%;
     text-align: right;
   }
+  
+  /* Better scrolling for mobile */
+  .mobile-scrollable {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+    max-height: 100%;
+  }

@@ -210,7 +210,7 @@ export default function Page() {
 
           <div className="text-sm font-semibold text-muted-foreground mb-1">דברי תורה</div>
           {/* Dvar Torah List - This ScrollArea should be flex-1 if it's the last expanding element */}
-          <ScrollArea className="flex-1 min-h-[200px]">
+          <ScrollArea className="flex-1 h-[calc(100vh-400px)]">
             <div className="space-y-1">
               {isContentLoading && book.length === 0 ? (<p className="text-xs text-muted-foreground text-center py-2">טוען...</p>)
                : book.length > 0 ? (
@@ -308,7 +308,7 @@ export default function Page() {
         {isMobile && isSidebarOpen && (
             <>
                 <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setIsSidebarOpen(false)}></div>
-                <aside className="fixed top-0 right-0 h-full w-4/5 max-w-xs bg-card text-card-foreground shadow-xl flex flex-col z-40 md:hidden overflow-y-auto">
+                <aside className="fixed top-0 right-0 h-full w-4/5 max-w-xs bg-card text-card-foreground shadow-xl flex flex-col z-40 md:hidden mobile-scrollable">
                     <div className="flex justify-between items-center p-3 border-b border-border sticky top-0 bg-card z-10">
                         <h2 className="text-lg font-semibold">ניווט</h2>
                         <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(false)}><X className="h-5 w-5"/></Button>
