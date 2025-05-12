@@ -248,7 +248,7 @@ export default function Page() {
             {/* Button to open sidebar on mobile, if sidebar is not part of the main flow */}
             {isMobile && !isSidebarOpen && (
                  <Button variant="outline" size="icon" onClick={() => setIsSidebarOpen(true)} className="md:hidden">
-                     <ChevronLeft />
+                     <ChevronRight />
                  </Button>
              )}
           </div>
@@ -294,12 +294,12 @@ export default function Page() {
         </main>
 
         {/* Sidebar for Desktop - always part of the flex flow */}
-        <aside className={`hidden md:flex flex-col w-72 lg:w-80 flex-shrink-0 border-r border-border bg-card text-card-foreground transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:w-16'}`}>
+        <aside className={`hidden md:flex flex-col w-72 lg:w-80 flex-shrink-0 border-l border-border bg-card text-card-foreground transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full md:w-16'}`}>
             <div className={`flex ${isSidebarOpen ? 'justify-between' : 'justify-center'} items-center p-3 border-b border-border sticky top-0 bg-card z-10`}>
-                <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1">
-                    {isSidebarOpen ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-                </Button>
                 {isSidebarOpen && <h2 className="text-lg font-semibold">ניווט</h2>}
+                <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1">
+                    {isSidebarOpen ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                </Button>
             </div>
             {isSidebarOpen && <SidebarItems />}
         </aside>
@@ -308,10 +308,10 @@ export default function Page() {
         {isMobile && isSidebarOpen && (
             <>
                 <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setIsSidebarOpen(false)}></div>
-                <aside className="fixed top-0 right-0 h-full w-4/5 max-w-xs bg-card text-card-foreground shadow-xl flex flex-col z-40 md:hidden overflow-y-auto">
+                <aside className="fixed top-0 left-0 h-full w-4/5 max-w-xs bg-card text-card-foreground shadow-xl flex flex-col z-40 md:hidden overflow-y-auto">
                     <div className="flex justify-between items-center p-3 border-b border-border sticky top-0 bg-card z-10">
-                        <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(false)}><X className="h-5 w-5"/></Button>
                         <h2 className="text-lg font-semibold">ניווט</h2>
+                        <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(false)}><X className="h-5 w-5"/></Button>
                     </div>
                     <SidebarItems />
                 </aside>
