@@ -1,0 +1,156 @@
+2025-05-12T05:06:24Z info: Deployment: 1ecb5da2-f7c0-4fc8-9a76-554b604fe0af
+2025-05-12T05:06:24Z info: Build: 270989c0-278c-40c7-aa96-beab1303e86f
+2025-05-12T05:06:24Z info: Connecting to builder
+2025-05-12T05:06:27Z info: Builder connected
+2025-05-12T05:06:27Z info: Installing packages
+2025-05-12T05:06:28Z info: Starting Build
+
+up to date, audited 461 packages in 4s
+
+162 packages are looking for funding
+  run `npm fund` for details
+
+
+1 critical severity vulnerability
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+npm notice
+npm notice New major version of npm available! 10.9.0 -> 11.3.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+npm notice To update run: npm install -g npm@11.3.0
+npm notice
+
+
+> divrei-yoel-v2@0.1.0 build
+> npm run build:data && next build
+
+
+
+> divrei-yoel-v2@0.1.0 build:data
+> node scripts/process-data.mjs
+
+
+PROCESSOR: Starting data processing...
+
+PROCESSOR: Generated types.json
+
+PROCESSOR: Parsing CSV: all_parshios_combined.csv
+
+PROCESSOR: Parsed 14459 rows from all_parshios_combined.csv
+
+PROCESSOR: Parsing CSV: all_moadim_combined.csv
+
+PROCESSOR: Parsed 18417 rows from all_moadim_combined.csv
+
+PROCESSOR: Generated sedarim.json
+
+PROCESSOR: Generated parshiot-Torah-בראשית.json
+
+PROCESSOR: Generated content-Torah-בראשית-וירא.json
+
+PROCESSOR: Generated content-Torah-בראשית-all.json
+
+PROCESSOR: Generated parshiot-Torah-שמות.json
+
+PROCESSOR: Generated content-Torah-שמות-שמות.json
+
+PROCESSOR: Generated content-Torah-שמות-וארא.json
+
+PROCESSOR: Generated content-Torah-שמות-בא.json
+
+PROCESSOR: Generated content-Torah-שמות-בשלח.json
+
+PROCESSOR: Generated content-Torah-שמות-יתרו.json
+
+PROCESSOR: Generated content-Torah-שמות-משפטים.json
+
+PROCESSOR: Generated content-Torah-שמות-תרומה.json
+
+PROCESSOR: Generated content-Torah-שמות-תצוה.json
+
+PROCESSOR: Generated content-Torah-שמות-ויקהל.json
+
+PROCESSOR: Generated parshiot-Torah-ויקרא.json
+
+PROCESSOR: Generated content-Torah-ויקרא-ויקרא.json
+
+PROCESSOR: Generated content-Torah-ויקרא-צו.json
+
+PROCESSOR: Generated content-Torah-ויקרא-שמיני.json
+
+PROCESSOR: Generated content-Torah-ויקרא-תזריע.json
+
+PROCESSOR: Generated content-Torah-ויקרא-מצורע.json
+
+PROCESSOR: Generated content-Torah-ויקרא-אחרי.json
+
+PROCESSOR: Generated content-Torah-ויקרא-קדושים.json
+
+PROCESSOR: Generated content-Torah-ויקרא-אמור.json
+
+PROCESSOR: Generated content-Torah-במדבר-במדבר.json
+
+PROCESSOR: Generated content-Torah-במדבר-נשא.json
+
+PROCESSOR: Generated content-Torah-במדבר-בהעלתך.json
+
+PROCESSOR: Generated content-Torah-במדבר-שלח.json
+
+PROCESSOR: Generated parshiot-Torah-דברים.json
+
+PROCESSOR: Generated content-Torah-דברים-עקב.json
+
+PROCESSOR: Generated content-Torah-דברים-תצא.json
+
+PROCESSOR: Generated content-Torah-דברים-ברכה.json
+
+PROCESSOR: Generated moadim.json
+
+PROCESSOR: Generated content-Moadim-חנוכה.json
+
+PROCESSOR: Generated content-Moadim-מועדים.json
+
+PROCESSOR: Generated content-Moadim-פסח.json
+
+PROCESSOR: Generated content-Moadim-פורים.json
+
+PROCESSOR: Generated content-Moadim-ראש השנה.json
+
+PROCESSOR: Generated content-Moadim-שבועות.json
+
+PROCESSOR: Generated content-Moadim-סוכות.json
+
+PROCESSOR: Data processing complete!
+
+  ▲ Next.js 14.2.16
+
+   Creating an optimized production build ...
+
+(node:100) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+(node:136) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ ✓ Compiled successfully
+
+   Linting and checking validity of types ...
+
+Failed to compile.
+
+
+./components/ui/accordion.tsx:4:37
+Type error: Cannot find module '@radix-ui/react-accordion' or its corresponding type declarations.
+
+  2 |
+  3 | import * as React from "react"
+> 4 | import * as AccordionPrimitive from "@radix-ui/react-accordion"
+    |                                     ^
+  5 | import { ChevronDown } from "lucide-react"
+  6 |
+  7 | import { cn } from "@/lib/utils"
+
