@@ -233,7 +233,14 @@ export default function Page() {
   return (
     <div className={`flex flex-col h-screen bg-background text-foreground ${language === "he" ? "rtl" : "ltr"}`}>
       <header className="app-header w-full bg-white dark:bg-slate-800 border-b border-border py-4 px-6 md:px-8 shadow-sm sticky top-0 z-30">
-        <div className="max-w-5xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center relative">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 rtl:right-0 rtl:left-auto">
+            <Button asChild variant="ghost" size="icon" className="rounded-full" title="חיפוש מתקדם">
+              <a href="/search">
+                <Search className="h-5 w-5" />
+              </a>
+            </Button>
+          </div>
           <h1 className="text-3xl md:text-4xl font-bold text-primary dark:text-primary-foreground">ספר דברי יואל - אוסף דברי תורה</h1>
           <p className="text-sm md:text-base text-muted-foreground mt-1">דברי תורה מאת רביה"ק מסאטמאר זי"ע</p>
         </div>
