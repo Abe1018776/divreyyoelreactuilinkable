@@ -48,7 +48,8 @@ async function processAllData() {
   const allMoadimKeys = new Set();
 
   const csvFilesToProcess = [
-    'all_parshios_combined.csv',
+    'כל_הפרשיות_חוץ_מאמור.csv',
+    'אמור.csv',
     'all_moadim_combined.csv'
   ];
 
