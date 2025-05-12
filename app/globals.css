@@ -118,3 +118,19 @@
     @apply w-4/5 right-[10%];
   }
 }
+
+
+  .rtl-title {
+    text-align: right;
+    width: 100%;
+    direction: rtl;
+  }
+  
+  /* Ensure buttons with RTL text have proper alignment */
+  button.rtl-button {
+    justify-content: flex-end;
+  }
+  button.rtl-button p {
+    width: 100%;
+    text-align: right;
+  }

@@ -153,9 +153,9 @@ export default function Page() {
           <ScrollArea className="h-[calc(100vh-280px)]"> {/* Adjust height as needed */}
             {searchResults.length > 0 ? (
               searchResults.map((result) => (
-                <Button key={result.dvar.dvar_torah_id} variant="ghost" className="w-full justify-start h-auto py-1.5 px-2 text-right text-sm rounded-md hover:bg-accent/70"
+                <Button key={result.dvar.dvar_torah_id} variant="ghost" className="w-full justify-end h-auto py-1.5 px-2 text-right text-sm rounded-md hover:bg-accent/70"
                         onClick={() => handleClickDvarTorah(result.dvar)}>
-                  <p className="truncate leading-snug">{result.dvar.title}</p>
+                  <p className="truncate leading-snug w-full text-right">{result.dvar.title}</p>
                 </Button>
               ))
             ) : (<p className="text-xs text-muted-foreground text-center py-4">לא נמצאו תוצאות</p>)}
@@ -216,9 +216,9 @@ export default function Page() {
                : book.length > 0 ? (
                 book.map((dvar) => (
                   <Button key={dvar.dvar_torah_id} variant={selectedDvar?.dvar_torah_id === dvar.dvar_torah_id ? "secondary" : "ghost"}
-                          className="w-full justify-start h-auto py-1.5 px-2 text-right text-sm rounded-md"
+                          className="w-full justify-end h-auto py-1.5 px-2 text-right text-sm rounded-md"
                           onClick={() => handleClickDvarTorah(dvar)}>
-                    <p className="truncate leading-snug">{dvar.title || "ללא כותרת"}</p>
+                    <p className="truncate leading-snug w-full text-right">{dvar.title || "ללא כותרת"}</p>
                   </Button>
                 ))
               ) : selectedSecondLevelItem ? (<p className="text-xs text-muted-foreground text-center py-4">אין דברי תורה</p>)
