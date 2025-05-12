@@ -155,20 +155,23 @@ export default function SearchPage() {
                     <Separator />
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:border-l border-border">
                       <ScrollArea className="h-[calc(100vh-300px)]">
                         {searchResults.length > 0 ? (
-                          <div className="space-y-2 pl-4">
+                          <div className="space-y-4 p-4">
                             {searchResults.map((result, index) => (
-                              <Button
+                              <div
                                 key={`${result.dvar.dvar_torah_id}-${index}`}
-                                variant={selectedResult === result ? "secondary" : "ghost"}
-                                className="w-full justify-end h-auto py-3 px-4 text-right space-y-1 rounded-md hover:bg-accent/70"
+                                className={`w-full border rounded-lg p-4 cursor-pointer transition-all ${
+                                  selectedResult === result 
+                                    ? "bg-secondary border-secondary" 
+                                    : "hover:bg-accent/40 border-border"
+                                }`}
                                 onClick={() => handleClickResult(result)}
                               >
                                 <div className="w-full flex flex-col items-end">
-                                  <div className="flex flex-wrap justify-end gap-1 mb-1 w-full">
+                                  <div className="flex flex-wrap justify-end gap-1 mb-2 w-full">
                                     <span className="text-xs bg-primary/10 px-2 py-1 rounded-full">
                                       {result.type === 'Torah' ? `תורה: ${result.seder} - ${result.parsha}` : `מועדים: ${result.parsha}`}
                                     </span>
@@ -177,10 +180,10 @@ export default function SearchPage() {
                                        result.matchType === 'summary' ? 'תקציר' : 'תוכן'}
                                     </span>
                                   </div>
-                                  <p className="text-sm font-semibold text-right w-full truncate">{result.dvar.title || "ללא כותרת"}</p>
-                                  <p className="text-xs text-muted-foreground text-right w-full truncate">{result.dvar.summary || "ללא תקציר"}</p>
+                                  <p className="text-sm font-semibold text-right w-full break-words whitespace-normal mb-2">{result.dvar.title || "ללא כותרת"}</p>
+                                  <p className="text-xs text-muted-foreground text-right w-full break-words whitespace-normal">{result.dvar.summary || "ללא תקציר"}</p>
                                 </div>
-                              </Button>
+                              </div>
                             ))}
                           </div>
                         ) : (
@@ -200,8 +203,8 @@ export default function SearchPage() {
                                   `מועדים: ${selectedResult.parsha}`}
                               </span>
                             </div>
-                            <h3 className="text-lg font-semibold mb-1">{selectedResult.dvar.title || "ללא כותרת"}</h3>
-                            <p className="text-sm text-muted-foreground mb-3">{selectedResult.dvar.summary || "ללא תקציר"}</p>
+                            <h3 className="text-lg font-semibold mb-1 break-words whitespace-normal">{selectedResult.dvar.title || "ללא כותרת"}</h3>
+                            <p className="text-sm text-muted-foreground mb-3 break-words whitespace-normal">{selectedResult.dvar.summary || "ללא תקציר"}</p>
                           </div>
                           <Separator className="my-3" />
                           <ScrollArea className="h-[calc(100vh-400px)]">
